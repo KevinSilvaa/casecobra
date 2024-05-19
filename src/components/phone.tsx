@@ -7,7 +7,12 @@ type PhoneProps = HTMLAttributes<HTMLDivElement> & {
   dark?: boolean
 }
 
-export function Phone({ imgSrc, dark, className, ...props }: PhoneProps) {
+export function Phone({
+  imgSrc,
+  dark = false,
+  className,
+  ...props
+}: PhoneProps) {
   return (
     <div
       className={cn(
@@ -25,7 +30,7 @@ export function Phone({ imgSrc, dark, className, ...props }: PhoneProps) {
         alt="Phone image"
         width={256}
         height={523}
-        className="pointer-events-none z-50 select-none"
+        className="pointer-events-none z-50 min-h-full min-w-full select-none"
       />
 
       <div className="absolute inset-0 -z-10">
@@ -34,7 +39,7 @@ export function Phone({ imgSrc, dark, className, ...props }: PhoneProps) {
           alt="Overlaying phone image"
           width={256}
           height={523}
-          className="object-cover"
+          className="min-h-full min-w-full object-cover"
         />
       </div>
     </div>

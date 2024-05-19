@@ -1,5 +1,7 @@
+import { UnderlineIcon } from '@/components/icons/underline-icon'
 import { MaxWidthWrapper } from '@/components/max-width-wrapper'
 import { Phone } from '@/components/phone'
+import { Reviews } from '@/components/reviews'
 import { users } from '@/constants/users'
 import { Check, Star } from 'lucide-react'
 import Image from 'next/image'
@@ -85,13 +87,19 @@ export default function Home() {
 
           <div className="col-span-full mt-32 flex h-fit w-full justify-center px-8 sm:px-16 md:px-0 lg:col-span-1 lg:mx-0 lg:mt-20">
             <div className="relative md:max-w-xl">
-              <img
+              <Image
                 src="/your-image.png"
+                alt="Phone indication with arrows"
+                width={208}
+                height={144}
                 className="s-50 absolute -top-20 left-56 hidden select-none sm:block lg:hidden lg:w-52 xl:block"
               />
 
-              <img
+              <Image
                 src="/line.png"
+                alt="Phone lines"
+                width={80}
+                height={143}
                 className="absolute -bottom-6 -left-6 w-20 select-none"
               />
 
@@ -99,6 +107,73 @@ export default function Home() {
             </div>
           </div>
         </MaxWidthWrapper>
+      </section>
+
+      {/* Value Proposition section */}
+      <section className="bg-slate-100 py-24">
+        <MaxWidthWrapper className="flex flex-col items-center gap-16 sm:gap-32">
+          <div className="flex flex-col items-center gap-4 sm:gap-6 lg:flex-row">
+            <h2 className="order-1 mt-2 text-balance text-center text-5xl font-bold !leading-tight tracking-tight text-gray-900 md:text-6xl">
+              What our{' '}
+              <span className="relative px-2">
+                customers{' '}
+                <UnderlineIcon className="pointer-events-none absolute inset-x-0 -bottom-6 hidden text-green-500 sm:block" />
+              </span>{' '}
+              say
+            </h2>
+
+            <Image
+              src="/snake-2.png"
+              alt="Snake image"
+              width={96}
+              height={85}
+              className="order-0 w-24 lg:order-2"
+            />
+          </div>
+
+          <div className="mx-auto grid max-w-3xl grid-cols-1 gap-y-16 px-4 lg:mx-0 lg:max-w-none lg:grid-cols-2">
+            {users.slice(0, 2).map((user) => (
+              <div
+                key={user.id}
+                className="flex flex-auto flex-col gap-4 lg:pr-8 xl:pr-20"
+              >
+                <div className="mb-2 flex gap-0.5">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <Star
+                      key={index}
+                      className="size-5 fill-green-600 text-green-600"
+                    />
+                  ))}
+                </div>
+
+                <div className="text-lg leading-8">{user.review()}</div>
+
+                <div className="mt-2 flex gap-4">
+                  <Image
+                    src={user.imageUrl}
+                    alt="User"
+                    width={48}
+                    height={48}
+                    className="size-12 rounded-full object-cover"
+                  />
+
+                  <div className="flex flex-col">
+                    <p className="font-semibold">{user.name}</p>
+
+                    <div className="flex items-center gap-1.5 text-zinc-600">
+                      <Check className="size-4 stroke-[3px] text-green-600" />
+                      <p className="text-sm">Verified Purchase</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </MaxWidthWrapper>
+
+        <div className="pt-16">
+          <Reviews />
+        </div>
       </section>
     </div>
   )
