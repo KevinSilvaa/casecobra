@@ -1,0 +1,42 @@
+import { cn } from '@/utils/cn'
+import Image from 'next/image'
+import { HTMLAttributes } from 'react'
+
+type PhoneProps = HTMLAttributes<HTMLDivElement> & {
+  imgSrc: string
+  dark?: boolean
+}
+
+export function Phone({ imgSrc, dark, className, ...props }: PhoneProps) {
+  return (
+    <div
+      className={cn(
+        'pointer-events-none relative z-50 overflow-hidden',
+        className,
+      )}
+      {...props}
+    >
+      <Image
+        src={
+          dark
+            ? '/phone-template-dark-edges.png'
+            : '/phone-template-white-edges.png'
+        }
+        alt="Phone image"
+        width={256}
+        height={523}
+        className="pointer-events-none z-50 select-none"
+      />
+
+      <div className="absolute inset-0 -z-10">
+        <Image
+          src={imgSrc}
+          alt="Overlaying phone image"
+          width={256}
+          height={523}
+          className="object-cover"
+        />
+      </div>
+    </div>
+  )
+}
