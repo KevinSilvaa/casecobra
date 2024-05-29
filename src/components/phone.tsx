@@ -1,6 +1,7 @@
-import { cn } from '@/utils/cn'
 import Image from 'next/image'
 import { HTMLAttributes } from 'react'
+
+import { cn } from '@/utils/cn'
 
 type PhoneProps = HTMLAttributes<HTMLDivElement> & {
   imgSrc: string

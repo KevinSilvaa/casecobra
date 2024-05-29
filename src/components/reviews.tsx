@@ -1,11 +1,13 @@
 'use client'
 
-import Image from 'next/image'
-import { MaxWidthWrapper } from './max-width-wrapper'
-import { ElementRef, HTMLAttributes, useEffect, useRef, useState } from 'react'
 import { useInView } from 'framer-motion'
-import { splitArray } from '@/utils/split-array'
+import Image from 'next/image'
+import { ElementRef, HTMLAttributes, useEffect, useRef, useState } from 'react'
+
 import { cn } from '@/utils/cn'
+import { splitArray } from '@/utils/split-array'
+
+import { MaxWidthWrapper } from './max-width-wrapper'
 import { Phone } from './phone'
 
 const PHONES = [

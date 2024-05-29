@@ -1,3 +1,7 @@
+import { ArrowRight, Check, Star } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+
 import { UnderlineIcon } from '@/components/icons/underline-icon'
 import { MaxWidthWrapper } from '@/components/max-width-wrapper'
 import { Phone } from '@/components/phone'
@@ -5,9 +9,6 @@ import { Reviews } from '@/components/reviews'
 import { buttonVariants } from '@/components/ui/button'
 import { users } from '@/constants/users'
 import { cn } from '@/utils/cn'
-import { ArrowRight, Check, Star } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
 
 export default function Home() {
   return (

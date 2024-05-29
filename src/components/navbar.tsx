@@ -1,10 +1,12 @@
-import Link from 'next/link'
-import { MaxWidthWrapper } from './max-width-wrapper'
-import { cn } from '@/utils/cn'
-import { buttonVariants } from './ui/button'
-import { ArrowRight } from 'lucide-react'
-import { Separator } from './ui/separator'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
+import { ArrowRight } from 'lucide-react'
+import Link from 'next/link'
+
+import { cn } from '@/utils/cn'
+
+import { MaxWidthWrapper } from './max-width-wrapper'
+import { buttonVariants } from './ui/button'
+import { Separator } from './ui/separator'
 
 export async function Navbar() {
   const { getUser } = getKindeServerSession()
