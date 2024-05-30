@@ -6,10 +6,13 @@ import {
   Radio,
   RadioGroup,
 } from '@headlessui/react'
+import { useMutation } from '@tanstack/react-query'
 import { ArrowRight, Check, ChevronsUpDown } from 'lucide-react'
-import Image from 'next/image'
-import { useState } from 'react'
+import NextImage from 'next/image'
+import { useRouter } from 'next/navigation'
+import { ElementRef, useRef, useState } from 'react'
 import { Rnd } from 'react-rnd'
+import { toast } from 'sonner'
 
 import { AspectRatio } from '@/components/ui/aspect-ratio'
 import { Button } from '@/components/ui/button'
@@ -23,6 +26,8 @@ import { Label } from '@/components/ui/label'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { BASE_PRICE } from '@/config/products'
+import { useUploadThing } from '@/lib/uploadthing'
+import { base64ToBlob } from '@/utils/base64-to-blob'
 import { cn } from '@/utils/cn'
 import { formatPrice } from '@/utils/format-price'
 import {
@@ -32,6 +37,7 @@ import {
   MODELS,
 } from '@/validators/option-validator'
 
+import { saveConfig, SaveConfigProps } from '../actions'
 import { HandleComponent } from './handle-component'
 
 type DesignConfiguratorProps = {
@@ -48,6 +54,23 @@ export function DesignConfigurator({
   imageUrl,
   imageDimensions,
 }: DesignConfiguratorProps) {
+  const router = useRouter()
+
+  const { mutate: saveConfigFn, isPending } = useMutation({
+    mutationKey: ['save-config'],
+    mutationFn: async (props: SaveConfigProps) => {
+      await Promise.all([saveConfiguration(), saveConfig(props)])
+    },
+    onSuccess: () => {
+      router.push(`/configure/preview?id=${configId}`)
+    },
+    onError: () => {
+      toast.error('Something went wrong', {
+        description: 'There was an error on our end. Please try again.',
+      })
+    },
+  })
+
   const [options, setOptions] = useState<{
     color: (typeof COLORS)[number]
     model: (typeof MODELS.options)[number]
@@ -60,15 +83,87 @@ export function DesignConfigurator({
     finish: FINISHES.options[0],
   })
 
+  const [renderedDimension, setRenderedDimension] = useState({
+    width: imageDimensions.width / 4,
+    height: imageDimensions.height / 4,
+  })
+
+  const [renderedPosition, setRenderedPosition] = useState({
+    x: 150,
+    y: 205,
+  })
+
+  const phoneCaseRef = useRef<ElementRef<'div'>>(null)
+  const containerRef = useRef<ElementRef<'div'>>(null)
+
+  const { startUpload } = useUploadThing('imageUploader')
+
+  async function saveConfiguration() {
+    try {
+      const {
+        left: caseLeft,
+        top: caseTop,
+        width,
+        height,
+      } = phoneCaseRef.current!.getBoundingClientRect()
+
+      const { left: containerLeft, top: containerTop } =
+        containerRef.current!.getBoundingClientRect()
+
+      const leftOffset = caseLeft - containerLeft
+      const topOffset = caseTop - containerTop
+
+      const actualX = renderedPosition.x - leftOffset
+      const actualY = renderedPosition.y - topOffset
+
+      const canvas = document.createElement('canvas')
+      canvas.width = width
+      canvas.height = height
+
+      const ctx = canvas.getContext('2d')
+
+      const userImage = new Image()
+      userImage.crossOrigin = 'anonymous'
+      userImage.src = imageUrl
+      await new Promise((resolve) => (userImage.onload = resolve))
+
+      ctx?.drawImage(
+        userImage,
+        actualX,
+        actualY,
+        renderedDimension.width,
+        renderedDimension.height,
+      )
+
+      const base64 = canvas.toDataURL()
+      const base64Data = base64.split(',')[1]
+
+      const blob = base64ToBlob(base64Data, 'image/png')
+
+      const file = new File([blob], 'filename.png', { type: 'image/png' })
+
+      await startUpload([file], { configId })
+    } catch (error) {
+      toast.error('Something went wrong', {
+        description:
+          'There was a problem saving your config, please try again.',
+      })
+    }
+  }
+
   return (
-    <div className="relative my-20 grid grid-cols-3 pb-20">
-      <div className="relative col-span-2 flex h-[37.5rem] w-full max-w-4xl items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+    <div className="relative my-20 grid grid-cols-1 pb-20 lg:grid-cols-3">
+      <div
+        ref={containerRef}
+        className="relative col-span-2 flex h-[37.5rem] w-full max-w-4xl items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-gray-300 p-12 text-center focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+      >
         <div className="pointer-events-none relative aspect-[896/1831] w-60 bg-opacity-50">
           <AspectRatio
+            ref={phoneCaseRef}
             ratio={896 / 1831}
             className="pointer-events-none relative z-50 aspect-[896/1831] w-full"
           >
-            <Image
+            <NextImage
               src="/phone-template.png"
               alt="Phone image"
               fill
@@ -101,10 +196,23 @@ export function DesignConfigurator({
             topRight: <HandleComponent />,
             topLeft: <HandleComponent />,
           }}
+          onResizeStop={(_, __, ref, ___, { x, y }) => {
+            setRenderedDimension({
+              width: parseInt(ref.style.width.slice(0, -2)),
+              height: parseInt(ref.style.height.slice(0, -2)),
+            })
+
+            setRenderedPosition({ x, y })
+          }}
+          onDragStop={(_, data) => {
+            const { x, y } = data
+
+            setRenderedPosition({ x, y })
+          }}
           className="x-20 absolute border-[3px] border-primary"
         >
           <div className="relative size-full">
-            <Image
+            <NextImage
               src={imageUrl}
               alt="Your image"
               fill
@@ -116,7 +224,7 @@ export function DesignConfigurator({
         </Rnd>
       </div>
 
-      <div className="flex h-[37.5rem] flex-col bg-white">
+      <div className="col-span-full flex h-[37.5rem] w-full flex-col bg-white lg:col-span-1">
         <ScrollArea className="relative flex-1 overflow-auto">
           <div
             aria-hidden="true"
@@ -286,7 +394,20 @@ export function DesignConfigurator({
                 )}
               </p>
 
-              <Button size="sm" className="w-full">
+              <Button
+                disabled={isPending}
+                onClick={() =>
+                  saveConfigFn({
+                    color: options.color.value,
+                    model: options.model.value,
+                    material: options.material.value,
+                    finish: options.finish.value,
+                    configId,
+                  })
+                }
+                size="sm"
+                className="w-full"
+              >
                 Continue
                 <ArrowRight className="ml-1.5 inline size-4" />
               </Button>
