@@ -67,7 +67,7 @@ export function DesignPreview({ configuration }: DesignPreviewProps) {
 
   async function handleCheckout() {
     if (user) {
-      createCheckoutSessionFn({ configId: configuration.id })
+      return createCheckoutSessionFn({ configId: configuration.id })
     }
 
     localStorage.setItem('configurationId', configuration.id)
