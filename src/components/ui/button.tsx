@@ -66,9 +66,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {isLoading && loadingText ? loadingText : children}
         {isLoading && (
           <span className="ml-1.5 flex items-center gap-1">
-            <span className="animate-flashing inline-block size-1 rounded-full bg-white" />
-            <span className="animate-flashing inline-block size-1 rounded-full bg-white delay-100" />
-            <span className="animate-flashing inline-block size-1 rounded-full bg-white delay-200" />
+            <span className="inline-block size-1 animate-flashing rounded-full bg-white" />
+            <span className="inline-block size-1 animate-flashing rounded-full bg-white delay-100" />
+            <span className="inline-block size-1 animate-flashing rounded-full bg-white delay-200" />
           </span>
         )}
       </Comp>
