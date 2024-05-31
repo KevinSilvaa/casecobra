@@ -27,7 +27,7 @@ export function Steps() {
   const pathname = usePathname()
 
   return (
-    <ol className="rounded-md bg-white lg:flex lg:rounded-none lg:border-l lg:border-r lg:bg-gray-200">
+    <ol className="rounded-md bg-white lg:flex lg:rounded-none lg:border-l lg:border-r lg:border-gray-200">
       {STEPS.map((step, i) => {
         const isCurrent = pathname.endsWith(step.url)
         const isCompleted = STEPS.slice(i + 1).some((step) =>

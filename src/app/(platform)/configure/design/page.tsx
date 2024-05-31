@@ -11,15 +11,15 @@ type DesignPageProps = {
 }
 
 export default async function DesignPage({ searchParams }: DesignPageProps) {
-  const imageId = searchParams.id
+  const configId = searchParams.id
 
-  if (!imageId || typeof imageId !== 'string') {
+  if (!configId || typeof configId !== 'string') {
     return notFound()
   }
 
   const configuration = await prisma.configuration.findUnique({
     where: {
-      id: imageId,
+      id: configId,
     },
   })
 

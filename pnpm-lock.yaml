@@ -71,6 +71,9 @@ dependencies:
   react-dom:
     specifier: ^18.3.1
     version: 18.3.1(react@18.3.1)
+  react-dom-confetti:
+    specifier: 0.2.0
+    version: 0.2.0(react@18.3.1)
   react-dropzone:
     specifier: 14.2.3
     version: 14.2.3(react@18.3.1)
@@ -3352,6 +3355,10 @@ packages:
       esutils: 2.0.3
     dev: true
 
+  /dom-confetti@0.2.2:
+    resolution: {integrity: sha512-+UVH9Y85qmpTnbmFURwLWjqLIykyIrsNSRkPX/eFlBuOURz9RDX8JoZHnajZHyFuCV0w/K3+tZK0ztfoTw6ejg==}
+    dev: false
+
   /eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
 
@@ -5186,6 +5193,15 @@ packages:
     dependencies:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
+    dev: false
+
+  /react-dom-confetti@0.2.0(react@18.3.1):
+    resolution: {integrity: sha512-+XRTi+WlCrcRN2dTjdEopOaPFtS7hpaHRRQ0sHiVRGqpchKz4QVh3i+6eLEEpNHYpN2VgPmhjvJ/vnjmUYhlIQ==}
+    peerDependencies:
+      react: '*'
+    dependencies:
+      dom-confetti: 0.2.2
+      react: 18.3.1
     dev: false
 
   /react-dom@18.3.1(react@18.3.1):
