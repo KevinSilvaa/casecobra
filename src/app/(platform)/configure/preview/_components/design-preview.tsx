@@ -1,10 +1,13 @@
 'use client'
 
+import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs'
 import { Configuration } from '@prisma/client'
 import { useMutation } from '@tanstack/react-query'
 import { ArrowRight, Check } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Confetti from 'react-dom-confetti'
+import { toast } from 'sonner'
 
 import { Phone } from '@/components/phone'
 import { Button } from '@/components/ui/button'
@@ -14,7 +17,8 @@ import { cn } from '@/utils/cn'
 import { formatPrice } from '@/utils/format-price'
 import { COLORS, MODELS } from '@/validators/option-validator'
 
-import { createCheckoutSession, CreateCheckoutSessionProps } from '../actions'
+import { createCheckoutSession } from '../actions'
+import { LoginModal } from './login-modal'
 
 type DesignPreviewProps = {
   configuration: Configuration
@@ -22,10 +26,15 @@ type DesignPreviewProps = {
 
 export function DesignPreview({ configuration }: DesignPreviewProps) {
   const [showConfetti, setShowConfetti] = useState(false)
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
 
   useEffect(() => {
     setShowConfetti(true)
   }, [])
+
+  const router = useRouter()
+
+  const { user } = useKindeBrowserClient()
 
   const { color, model, material, finish } = configuration
 
@@ -41,9 +50,29 @@ export function DesignPreview({ configuration }: DesignPreviewProps) {
 
   const { mutate: createCheckoutSessionFn } = useMutation({
     mutationKey: ['get-checkout-session'],
-    mutationFn: (props: CreateCheckoutSessionProps) =>
-      createCheckoutSession(props),
+    mutationFn: createCheckoutSession,
+    onSuccess: (data) => {
+      if (data.url) {
+        router.push(data.url)
+      }
+
+      throw new Error('Unable to retrieve payment URL.')
+    },
+    onError: () => {
+      toast.error('Something went wrong', {
+        description: 'There was an error on our end. Please try again.',
+      })
+    },
   })
+
+  async function handleCheckout() {
+    if (user) {
+      createCheckoutSessionFn({ configId: configuration.id })
+    }
+
+    localStorage.setItem('configurationId', configuration.id)
+    setIsLoginModalOpen(true)
+  }
 
   return (
     <>
@@ -59,6 +88,8 @@ export function DesignPreview({ configuration }: DesignPreviewProps) {
           }}
         />
       </div>
+
+      <LoginModal isOpen={isLoginModalOpen} setIsOpen={setIsLoginModalOpen} />
 
       <div className="mt-20 grid grid-cols-1 text-sm sm:grid-cols-12 sm:grid-rows-1 sm:gap-x-6 md:gap-x-8 lg:gap-x-12">
         <div className="sm:col-span-4 md:col-span-3 md:row-span-2 md:row-end-2">
@@ -146,12 +177,7 @@ export function DesignPreview({ configuration }: DesignPreviewProps) {
             </div>
 
             <div className="mt-8 flex justify-end pb-12">
-              <Button
-                onClick={() =>
-                  createCheckoutSessionFn({ configId: configuration.id })
-                }
-                className="px-4 sm:px-6 lg:px-8"
-              >
+              <Button onClick={handleCheckout} className="px-4 sm:px-6 lg:px-8">
                 Checkout
                 <ArrowRight className="ml-1.5 inline size-4" />
               </Button>
