@@ -396,6 +396,8 @@ export function DesignConfigurator({
 
               <Button
                 disabled={isPending}
+                isLoading={isPending}
+                loadingText="Saving"
                 onClick={() =>
                   saveConfigFn({
                     color: options.color.value,
