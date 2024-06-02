@@ -28,5 +28,6 @@ export function constructMetadata({
       images: [image],
     },
     icons,
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SERVER_URL!),
   }
 }
