@@ -25,7 +25,7 @@ export default function RootLayout({
       <body className={recursive.className}>
         <Navbar />
 
-        <main className="grainy-light flex min-h-[calc(100vh-3.5rem-1px)] flex-col">
+        <main className="grainy-light flex h-full min-h-[calc(100vh-3.5rem-1px)] flex-col">
           <div className="flex h-full flex-1 flex-col">
             <Providers>{children}</Providers>
           </div>
