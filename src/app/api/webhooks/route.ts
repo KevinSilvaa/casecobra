@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
+import { Resend } from 'resend'
 
+import { OrderReceivedEmail } from '@/components/emails/order-received-email'
 import { prisma } from '@/lib/prisma'
 import { stripe } from '@/lib/stripe'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(req: Request) {
   try {
@@ -41,7 +45,7 @@ export async function POST(req: Request) {
       const billingAddress = session.customer_details!.address
       const shippingAddress = session.shipping_details!.address
 
-      await prisma.order.update({
+      const updatedOrder = await prisma.order.update({
         where: {
           id: orderId,
         },
@@ -68,6 +72,25 @@ export async function POST(req: Request) {
             },
           },
         },
+      })
+
+      await resend.emails.send({
+        from: 'CaseCobra <kevinsilvarj10@gmail.com>',
+        to: [event.data.object.customer_details.email],
+        subject: 'Thanks for your order!',
+        react: OrderReceivedEmail({
+          orderId,
+          orderDate: updatedOrder.createdAt.toLocaleDateString(),
+          // @ts-expect-error This is not giving an error, it's just a typescript thing
+          shippingAddress: {
+            name: session.customer_details?.name as string,
+            city: shippingAddress?.city as string,
+            country: shippingAddress?.country as string,
+            postalCode: shippingAddress?.postal_code as string,
+            street: shippingAddress?.line1 as string,
+            state: shippingAddress?.state as string,
+          },
+        }),
       })
     }
 
