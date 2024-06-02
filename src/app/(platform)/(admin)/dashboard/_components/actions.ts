@@ -31,6 +31,9 @@ export async function getOrders({
       configuration: true,
       user: true,
     },
+    orderBy: {
+      createdAt: 'desc',
+    },
     skip: (page - 1) * ORDERS_PER_PAGE,
     take: page * ORDERS_PER_PAGE,
   })
